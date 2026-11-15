@@ -1,0 +1,29 @@
+# Products you want to hear about. Edit freely.
+#
+#   name:       heading shown in the digest
+#   keywords:   any of these words inside the product name is a match (case-insensitive).
+#               Use word stems to catch Bulgarian endings: "пилешк" matches пилешко, пилешки, пилешка...
+#   exclude:    (optional) skip products containing any of these words
+#   max_price:  (optional) only report offers at or below this price, in EUR
+#
+# This is a starter list - replace it with what you actually buy.
+items:
+  - name: Кафе
+    keywords: [кафе, lavazza]
+    exclude: [капсули, студено, бисквит, напитка, шоколад, вафла]
+
+  - name: Пилешко
+    keywords: [пилешк]
+
+  - name: Сьомга и риба
+    keywords: [сьомга, пъстърва, скумрия]
+
+  - name: Сирене и кашкавал
+    keywords: [сирене, кашкавал]
+    exclude: [крема, топено, геврек, баница, тутманик, пица, хлебче, питка, пастет]
+
+  - name: Зехтин
+    keywords: [зехтин]
+
+  - name: Прясно мляко
+    keywords: [прясно мляко]

@@ -1,0 +1,62 @@
+name: daily-promotions
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # 07:00 Sofia in winter, 08:00 in summer
+  workflow_dispatch:
+    inputs:
+      always:
+        description: "Send the digest even if nothing is new"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # lets the job commit state/seen.json
+
+concurrency:
+  group: daily-promotions
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -e .
+
+      - name: Build and send the digest
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ALWAYS: ${{ inputs.always && '--always' || '' }}
+        run: python -m grocery_agent $ALWAYS
+
+      - name: Keep the HTML as a run artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest
+          path: out/digest.html
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Save what was already reported
+        if: always()
+        run: |
+          git config user.name "grocery-agent[bot]"
+          git config user.email "grocery-agent@users.noreply.github.com"
+          git add state/seen.json
+          if git diff --cached --quiet; then
+            echo "state unchanged"
+          else
+            git commit -m "chore: update seen offers"
+            git push
+          fi

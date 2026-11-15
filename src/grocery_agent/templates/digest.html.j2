@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Промоции {{ today.strftime("%d.%m.%Y") }}</title>
+<style>
+  :root { --bg:#f4f5f7; --card:#fff; --text:#1c1e21; --muted:#6b7280; --line:#e5e7eb; --accent:#d62828; --new:#16a34a; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111418; --card:#1b1f26; --text:#e8eaed; --muted:#9aa3af; --line:#2b313a; --accent:#ff6b6b; --new:#4ade80; } }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:12px; background:var(--bg); color:var(--text); font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:680px; margin:0 auto; }
+  h1 { font-size:1.35rem; margin:.2rem 0 .1rem; }
+  .sub { color:var(--muted); font-size:.9rem; margin-bottom:1rem; }
+  h2 { font-size:1.1rem; margin:1.4rem 0 .5rem; }
+  .warn { background:#fff4e5; color:#7a4100; border-radius:10px; padding:.6rem .8rem; margin-bottom:1rem; }
+  .empty { color:var(--muted); padding:1rem 0; }
+  .offer { display:flex; gap:.7rem; background:var(--card); border:1px solid var(--line); border-left-width:5px; border-radius:10px; padding:.6rem .7rem; margin-bottom:.5rem; }
+  .offer img { width:64px; height:64px; object-fit:contain; border-radius:6px; flex:none; background:#fff; }
+  .body { flex:1; min-width:0; }
+  .name { font-weight:600; overflow-wrap:anywhere; }
+  .name a { color:inherit; text-decoration:none; }
+  .meta { color:var(--muted); font-size:.85rem; margin-top:.15rem; }
+  .price { font-size:1.15rem; font-weight:700; color:var(--accent); }
+  .old { color:var(--muted); text-decoration:line-through; margin-left:.4rem; font-size:.9rem; }
+  .pct { background:var(--accent); color:#fff; border-radius:6px; padding:0 .35rem; font-size:.8rem; margin-left:.4rem; }
+  .new { background:var(--new); color:#fff; border-radius:6px; padding:0 .35rem; font-size:.75rem; margin-right:.4rem; vertical-align:middle; }
+  .shop-Lidl { border-left-color:#0050aa; } .shop-Kaufland { border-left-color:#e10915; } .shop-Billa { border-left-color:#f5a800; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🛒 Промоции {{ today.strftime("%d.%m.%Y") }}</h1>
+  <div class="sub">{% if new_count %}{{ new_count }} нови от списъка ти{% else %}Нищо ново от последния път{% endif %}</div>
+
+  {% if failed_shops %}
+  <div class="warn">⚠ {{ failed_shops | join(", ") }} не можа да бъде прочетен днес.</div>
+  {% endif %}
+
+  {% for item, entries in groups.items() %}
+  <h2>{{ item }}</h2>
+  {% for e in entries %}
+  {% set o = e.offer %}
+  <div class="offer shop-{{ o.shop }}">
+    {% if o.image %}<img src="{{ o.image }}" alt="" loading="lazy">{% endif %}
+    <div class="body">
+      <div class="name">{% if e.is_new %}<span class="new">НОВО</span>{% endif %}{% if o.url %}<a href="{{ o.url }}">{{ o.name }}</a>{% else %}{{ o.name }}{% endif %}</div>
+      <div>
+        <span class="price">{{ o.price | money }}</span>
+        {% if o.old_price %}<span class="old">{{ o.old_price | money }}</span>{% endif %}
+        {% if o.discount_pct %}<span class="pct">-{{ o.discount_pct }}%</span>{% endif %}
+      </div>
+      <div class="meta">{{ o.shop }}{% if o.unit %} · {{ o.unit }}{% endif %}{% if o.valid_to %} · до {{ o.valid_to | short_date }}{% endif %}{% if o.note %} · {{ o.note }}{% endif %}</div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="empty">Няма промоции за продуктите от списъка ти.</div>
+  {% endfor %}
+</main>
+</body>
+</html>
