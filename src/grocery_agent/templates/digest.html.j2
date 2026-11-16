@@ -25,7 +25,11 @@
   .old { color:var(--muted); text-decoration:line-through; margin-left:.4rem; font-size:.9rem; }
   .pct { background:var(--accent); color:#fff; border-radius:6px; padding:0 .35rem; font-size:.8rem; margin-left:.4rem; }
   .new { background:var(--new); color:#fff; border-radius:6px; padding:0 .35rem; font-size:.75rem; margin-right:.4rem; vertical-align:middle; }
-  .shop-Lidl { border-left-color:#0050aa; } .shop-Kaufland { border-left-color:#e10915; } .shop-Billa { border-left-color:#f5a800; }
+  .shop-Lidl { border-left-color:#0050aa; } .shop-Kaufland { border-left-color:#e10915; } .shop-Billa { border-left-color:#f5a800; } .shop-eBag { border-left-color:#6dbf3a; }
+  [hidden] { display:none !important; }
+  .filters { position:sticky; top:0; z-index:5; display:flex; gap:.5rem; padding:.6rem 0; margin-bottom:.4rem; background:var(--bg); }
+  .filters select { flex:1; min-width:0; padding:.55rem .6rem; font:inherit; color:var(--text); background:var(--card); border:1px solid var(--line); border-radius:10px; }
+  #none { color:var(--muted); padding:1rem 0; }
 </style>
 </head>
 <body>
@@ -37,11 +41,28 @@
   <div class="warn">⚠ {{ failed_shops | join(", ") }} не можа да бъде прочетен днес.</div>
   {% endif %}
 
+  {% if groups %}
+  <div class="filters">
+    <select id="shop-filter" aria-label="Магазин">
+      <option value="">Всички магазини</option>
+      {% for shop, n in shop_counts.items() %}<option value="{{ shop }}">{{ shop }} ({{ n }})</option>
+      {% endfor %}
+    </select>
+    <select id="group-filter" aria-label="Категория">
+      <option value="">Всички категории</option>
+      {% for item, entries in groups.items() %}<option value="{{ item }}">{{ item }} ({{ entries | length }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div id="none" hidden>Няма промоции за този избор.</div>
+  {% endif %}
+
   {% for item, entries in groups.items() %}
+  <section class="group" data-group="{{ item }}">
   <h2>{{ item }}</h2>
   {% for e in entries %}
   {% set o = e.offer %}
-  <div class="offer shop-{{ o.shop }}">
+  <div class="offer shop-{{ o.shop }}" data-shop="{{ o.shop }}">
     {% if o.image %}<img src="{{ o.image }}" alt="" loading="lazy">{% endif %}
     <div class="body">
       <div class="name">{% if e.is_new %}<span class="new">НОВО</span>{% endif %}{% if o.url %}<a href="{{ o.url }}">{{ o.name }}</a>{% else %}{{ o.name }}{% endif %}</div>
@@ -50,13 +71,40 @@
         {% if o.old_price %}<span class="old">{{ o.old_price | money }}</span>{% endif %}
         {% if o.discount_pct %}<span class="pct">-{{ o.discount_pct }}%</span>{% endif %}
       </div>
-      <div class="meta">{{ o.shop }}{% if o.unit %} · {{ o.unit }}{% endif %}{% if o.valid_to %} · до {{ o.valid_to | short_date }}{% endif %}{% if o.note %} · {{ o.note }}{% endif %}</div>
+      <div class="meta">{{ o.shop }}{% if o.unit %} · {{ o.unit }}{% endif %}{% if o | period %} · {{ o | period }}{% endif %}{% if o.note %} · {{ o.note }}{% endif %}</div>
     </div>
   </div>
   {% endfor %}
+  </section>
   {% else %}
   <div class="empty">Няма промоции за продуктите от списъка ти.</div>
   {% endfor %}
 </main>
+{% if groups %}
+<script>
+  (function () {
+    var shop = document.getElementById("shop-filter");
+    var group = document.getElementById("group-filter");
+    var none = document.getElementById("none");
+    function apply() {
+      var any = false;
+      document.querySelectorAll("section.group").forEach(function (s) {
+        var groupOk = !group.value || s.dataset.group === group.value;
+        var visible = 0;
+        s.querySelectorAll(".offer").forEach(function (o) {
+          var ok = groupOk && (!shop.value || o.dataset.shop === shop.value);
+          o.hidden = !ok;
+          if (ok) visible++;
+        });
+        s.hidden = visible === 0;
+        if (visible) any = true;
+      });
+      none.hidden = any;
+    }
+    shop.addEventListener("change", apply);
+    group.addEventListener("change", apply);
+  })();
+</script>
+{% endif %}
 </body>
 </html>

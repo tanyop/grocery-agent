@@ -8,22 +8,37 @@
 #
 # This is a starter list - replace it with what you actually buy.
 items:
-  - name: Кафе
-    keywords: [кафе, lavazza]
+  - name: Lavazza
+    keywords: [lavazza]
     exclude: [капсули, студено, бисквит, напитка, шоколад, вафла]
 
   - name: Пилешко
     keywords: [пилешк]
+    exclude: [пастет, пюре, супа, кучета, котки, храна за]
+
 
   - name: Сьомга и риба
     keywords: [сьомга, пъстърва, скумрия]
+    exclude: [пастет, пюре, супа, кучета, котки, храна за]
 
   - name: Сирене и кашкавал
     keywords: [сирене, кашкавал]
     exclude: [крема, топено, геврек, баница, тутманик, пица, хлебче, питка, пастет]
 
-  - name: Зехтин
-    keywords: [зехтин]
+  - name: Скир
+    keywords: [skyr, скир]
 
-  - name: Прясно мляко
-    keywords: [прясно мляко]
+  - name: Извара
+    keywords: [извара]
+
+  - name: Свинско
+    keywords: [свинск]
+    exclude: [кучета, котки, храна за]
+
+  - name: Телешко и говеждо
+    keywords: [телешк, говежд]
+    exclude: [кучета, котки, храна за]
+
+  - name: Пуешко
+    keywords: [пуешк]
+    exclude: [пастет, пюре, кучета, котки, храна за]

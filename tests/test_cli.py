@@ -31,7 +31,7 @@ def test_extract_chat_ids_from_updates():
 def test_main_dry_run_end_to_end_with_fake_shop(tmp_path, monkeypatch):
     w = tmp_path / "w.yaml"
     w.write_text(WATCH, encoding="utf-8")
-    fake = lambda client: [Offer("Lidl", "Прясно мляко", 1.2, valid_to=date(2099, 1, 1))]
+    fake = lambda client, keywords=None: [Offer("Lidl", "Прясно мляко", 1.2, valid_to=date(2099, 1, 1))]
     monkeypatch.setattr(cli, "SCRAPERS", {"Lidl": fake})
     code = cli.main(["--dry-run", "--watchlist", str(w), "--out", str(tmp_path / "out"), "--state", str(tmp_path / "s.json")])
     assert code == 0
@@ -42,7 +42,7 @@ def test_main_dry_run_end_to_end_with_fake_shop(tmp_path, monkeypatch):
 def test_main_without_telegram_credentials_fails_clearly(tmp_path, monkeypatch, capsys):
     w = tmp_path / "w.yaml"
     w.write_text(WATCH, encoding="utf-8")
-    monkeypatch.setattr(cli, "SCRAPERS", {"Lidl": lambda client: []})
+    monkeypatch.setattr(cli, "SCRAPERS", {"Lidl": lambda client, keywords=None: []})
     monkeypatch.delenv("TELEGRAM_BOT_TOKEN", raising=False)
     monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
     monkeypatch.chdir(tmp_path)  # no .env here
@@ -54,3 +54,24 @@ def test_main_without_telegram_credentials_fails_clearly(tmp_path, monkeypatch, 
 def test_unknown_shop_is_rejected():
     with pytest.raises(SystemExit):
         cli.main(["--shops", "Nope", "--dry-run"])
+
+
+def test_scrapers_receive_all_watchlist_keywords(tmp_path, monkeypatch):
+    w = tmp_path / "w.yaml"
+    w.write_text(
+        "items:\n  - name: A\n    keywords: [мляко, skyr]\n  - name: B\n    keywords: [пилешк]\n",
+        encoding="utf-8",
+    )
+    seen = {}
+
+    def fake(client, keywords=None):
+        seen["keywords"] = keywords
+        return []
+
+    monkeypatch.setattr(cli, "SCRAPERS", {"eBag": fake})
+    cli.main(["--dry-run", "--watchlist", str(w), "--out", str(tmp_path / "o")])
+    assert seen["keywords"] == ["мляко", "skyr", "пилешк"]
+
+
+def test_ebag_is_a_known_shop():
+    assert "eBag" in cli.SCRAPERS

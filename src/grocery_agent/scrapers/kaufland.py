@@ -89,5 +89,5 @@ def parse(html: str) -> list[Offer]:
     return offers
 
 
-def scrape(client: httpx.Client) -> list[Offer]:
+def scrape(client: httpx.Client, keywords: list[str] | None = None) -> list[Offer]:
     return parse(fetch(client, URL))

@@ -11,12 +11,12 @@ from zoneinfo import ZoneInfo
 import httpx
 
 from .pipeline import Options, run
-from .scrapers import billa, kaufland, lidl
+from .scrapers import billa, ebag, kaufland, lidl
 from .scrapers.base import make_client
 from .telegram import Telegram
 from .watchlist import load_watchlist
 
-SCRAPERS = {"Lidl": lidl.scrape, "Kaufland": kaufland.scrape, "Billa": billa.scrape}
+SCRAPERS = {"Lidl": lidl.scrape, "Kaufland": kaufland.scrape, "Billa": billa.scrape, "eBag": ebag.scrape}
 
 
 def parse_env_file(path: str | Path) -> dict[str, str]:
@@ -112,7 +112,8 @@ def main(argv: list[str] | None = None) -> int:
 
     items = load_watchlist(args.watchlist)
     client = make_client()
-    scrapers = {shop: (lambda s=SCRAPERS[shop]: s(client)) for shop in wanted}
+    keywords = [k for item in items for k in item.keywords]
+    scrapers = {shop: (lambda s=SCRAPERS[shop]: s(client, keywords)) for shop in wanted}
     options = Options(
         out_dir=args.out,
         state_path=args.state,

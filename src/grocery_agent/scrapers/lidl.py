@@ -87,7 +87,9 @@ def parse(html: str) -> list[Offer]:
     return offers
 
 
-def scrape(client: httpx.Client, workers: int = 4, pause: float = 0.2) -> list[Offer]:
+def scrape(
+    client: httpx.Client, keywords: list[str] | None = None, workers: int = 4, pause: float = 0.2
+) -> list[Offer]:
     home = fetch(client, BASE + "/")
     paths = discover_links(home)
     if not paths:

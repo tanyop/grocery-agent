@@ -1,6 +1,6 @@
 # grocery-agent
 
-Every day it reads the current promotions of **Lidl, Kaufland and Billa** (Bulgaria), keeps only the products on your
+Every day it reads the current promotions of **Lidl, Kaufland, Billa and eBag** (Bulgaria), keeps only the products on your
 `watchlist.yaml`, builds a phone-friendly `digest.html`, and sends it to you on **Telegram**: a short text with
 the *new* matches, plus the full HTML file.
 
@@ -28,7 +28,7 @@ python -m venv .venv
 .venv\Scripts\python -m grocery_agent             # the real thing: sends to Telegram
 ```
 
-Flags: `--always` send even if nothing is new, `--all` treat every match as new, `--shops Lidl,Billa`,
+Flags: `--always` send even if nothing is new, `--all` treat every match as new, `--shops Lidl,Billa,eBag`,
 `--watchlist`, `--state`, `--out`. Tests: `.venv\Scripts\python -m pytest`.
 
 ## Run daily in the cloud (GitHub Actions)
@@ -49,6 +49,7 @@ on your own PC with Windows Task Scheduler instead.
 | Billa | text version of the weekly brochure, `ssbbilla.site` |
 | Kaufland | offer JSON embedded in the all-offers page |
 | Lidl | product tiles (`data-grid-data`) on campaign and category pages found from the homepage |
+| eBag | the JSON feed behind the site's "Оферти" page (about 200 requests; regular price, promo price, discount and dates) |
 
 If a site changes its layout, that shop's scraper fails on its own, the digest says which shop could not be read,
 and the other shops still arrive. Parsers are tested against trimmed snapshots in `tests/fixtures/`.
