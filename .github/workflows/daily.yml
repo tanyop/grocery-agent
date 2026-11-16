@@ -2,7 +2,7 @@ name: daily-promotions
 
 on:
   schedule:
-    - cron: "0 5 * * *" # 07:00 Sofia in winter, 08:00 in summer
+    - cron: "17 5 * * *" # ~07:17 Sofia in winter, ~08:17 in summer (off the busy top of the hour)
   workflow_dispatch:
     inputs:
       always:

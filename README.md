@@ -36,7 +36,7 @@ Flags: `--always` send even if nothing is new, `--all` treat every match as new,
 1. Push this folder to a GitHub repository (private is fine).
 2. Repository **Settings → Secrets and variables → Actions → New repository secret**: add `TELEGRAM_BOT_TOKEN` and
    `TELEGRAM_CHAT_ID`.
-3. **Actions → daily-promotions → Run workflow** to test it once. After that it runs every day at 05:00 UTC.
+3. **Actions → daily-promotions → Run workflow** to test it once. After that it runs every day at about 05:17 UTC.
 
 The workflow commits `state/seen.json` (the offers already reported) back to the repo, which also keeps GitHub
 from pausing the schedule after 60 days of inactivity. If a shop ever blocks GitHub's servers, run the same command
