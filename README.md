@@ -19,6 +19,19 @@ Fantastico's own site refuses automated requests (HTTP 403), so its promotions c
    then run `python -m grocery_agent --find-chat-id` and copy the printed `TELEGRAM_CHAT_ID=...` into `.env` too.
 4. **Edit `watchlist.yaml`** with the products you buy.
 
+### Sending to more than one person
+
+Each person opens your bot in Telegram, presses **Start**, and sends it any message (a bot cannot write first).
+Run `--find-chat-id` again: it lists every chat that wrote to the bot. Join the ids with commas:
+
+```
+TELEGRAM_CHAT_ID=111111111,222222222
+```
+
+(in `.env`, and in the GitHub secret `TELEGRAM_CHAT_ID`). If one person cannot be reached, the others still receive
+the file and the run log shows a warning for the missing one. Alternatively, create a Telegram group with the bot in it
+and use the group's id (a negative number).
+
 ## Run locally
 
 ```

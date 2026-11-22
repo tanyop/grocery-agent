@@ -13,7 +13,7 @@ import httpx
 from .pipeline import Options, run
 from .scrapers import billa, ebag, fantastico, kaufland, lidl
 from .scrapers.base import make_client
-from .telegram import Telegram
+from .telegram import Telegram, parse_chat_ids
 from .watchlist import load_watchlist
 
 SCRAPERS = {"Lidl": lidl.scrape, "Kaufland": kaufland.scrape, "Billa": billa.scrape, "eBag": ebag.scrape, "Fantastico": fantastico.scrape}
@@ -63,6 +63,8 @@ def _find_chat_id(token: str) -> int:
         return 1
     for chat_id, name in chats:
         print(f"TELEGRAM_CHAT_ID={chat_id}    ({name})")
+    if len(chats) > 1:
+        print("To send to several people, join their ids with commas, e.g. TELEGRAM_CHAT_ID=" + ",".join(str(c) for c, _ in chats))
     return 0
 
 
@@ -105,7 +107,7 @@ def main(argv: list[str] | None = None) -> int:
 
     sender = None
     if not args.dry_run:
-        if not token or not chat_id:
+        if not token or not parse_chat_ids(chat_id):
             print("Missing TELEGRAM_BOT_TOKEN and/or TELEGRAM_CHAT_ID (env vars or .env file).", file=sys.stderr)
             return 2
         sender = Telegram(token, chat_id)
