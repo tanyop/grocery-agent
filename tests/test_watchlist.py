@@ -71,3 +71,38 @@ def test_invalid_watchlist_gives_clear_error(tmp_path, text):
     f.write_text(text, encoding="utf-8")
     with pytest.raises(ValueError):
         load_watchlist(f)
+
+
+def names(hits, item):
+    return [o.name for o in hits.get(item, [])]
+
+
+def test_keyword_matches_only_at_the_start_of_a_word():
+    items = [WatchItem("Лук", ["лук"])]
+    hits = match([offer("Червен лук"), offer("Лукът е здраве"), offer("Кош за боклук"), offer("Печени ядки Делукс")], items)
+    assert set(names(hits, "Лук")) == {"Червен лук", "Лукът е здраве"}
+
+
+def test_keyword_at_word_start_works_after_punctuation_and_at_name_start():
+    items = [WatchItem("Домати", ["домат"])]
+    hits = match([offer("Домати Рома"), offer("Салата (домати, краставици)"), offer("Пюре-домат")], items)
+    assert len(hits["Домати"]) == 3
+
+
+def test_dollar_suffix_requires_a_whole_word():
+    items = [WatchItem("Зеле", ["зеле$"])]
+    hits = match([offer("Зеле"), offer("Бяло зеле, кг"), offer("Зелени маслини"), offer("Зелето е здраво")], items)
+    assert {o.name for o in hits["Зеле"]} == {"Зеле", "Бяло зеле, кг"}
+
+
+def test_exclude_also_works_on_word_starts_not_inside_words():
+    items = [WatchItem("Круши", ["круш"], exclude=["бар"])]
+    hits = match([offer("Бар с круши"), offer("Круши Уилямс"), offer("Крушови барчета")], items)
+    # "Бар с круши" excluded (word "бар"); "Крушови барчета" excluded too: "бар" starts the word "барчета"
+    assert [o.name for o in hits["Круши"]] == ["Круши Уилямс"]
+
+
+def test_inner_word_text_does_not_trigger_exclude():
+    items = [WatchItem("Х", ["ябълк"], exclude=["сок"])]
+    hits = match([offer("Ябълки Фуджи"), offer("Ябълки Босок")], items)  # "Босок" contains "сок" only inside a word
+    assert len(hits["Х"]) == 2

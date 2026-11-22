@@ -11,12 +11,12 @@ from zoneinfo import ZoneInfo
 import httpx
 
 from .pipeline import Options, run
-from .scrapers import billa, ebag, kaufland, lidl
+from .scrapers import billa, ebag, fantastico, kaufland, lidl
 from .scrapers.base import make_client
 from .telegram import Telegram
 from .watchlist import load_watchlist
 
-SCRAPERS = {"Lidl": lidl.scrape, "Kaufland": kaufland.scrape, "Billa": billa.scrape, "eBag": ebag.scrape}
+SCRAPERS = {"Lidl": lidl.scrape, "Kaufland": kaufland.scrape, "Billa": billa.scrape, "eBag": ebag.scrape, "Fantastico": fantastico.scrape}
 
 
 def parse_env_file(path: str | Path) -> dict[str, str]:

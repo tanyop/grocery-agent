@@ -1,9 +1,10 @@
 # Products you want to hear about. Edit freely.
 #
 #   name:       heading shown in the digest
-#   keywords:   any of these words inside the product name is a match (case-insensitive).
+#   keywords:   a product matches when its name has a word that STARTS with one of these (case-insensitive).
 #               Use word stems to catch Bulgarian endings: "пилешк" matches пилешко, пилешки, пилешка...
-#   exclude:    (optional) skip products containing any of these words
+#               Add $ to require the whole word: "лук$" matches "лук" but not "лукан" or "боклук".
+#   exclude:    (optional) skip products that have a word starting with any of these (several words are fine: "храна за")
 #   max_price:  (optional) only report offers at or below this price, in EUR
 #
 # This is a starter list - replace it with what you actually buy.
@@ -42,3 +43,43 @@ items:
   - name: Пуешко
     keywords: [пуешк]
     exclude: [пастет, пюре, кучета, котки, храна за]
+
+  # Fresh fruit. Whole words ($) so "ябълка" does not catch "ябълков сок"; excludes drop drinks, cosmetics, baby food, sweets.
+  - name: Плодове
+    keywords:
+      [ябълка$, ябълки$, круша$, круши$, банан$, банани$, биобанани$, портокал$, портокали$, мандарина$, мандарини$,
+       грозде$, киви$, лимон$, лимони$, ананас$, авокадо$, праскова$, праскови$, нектарини$, слива$, сливи$, ягоди$,
+       диня$, пъпеш$, кайсии$, череши$, манго$, хурма$, грейпфрут$, малини$, боровинки$, къпини$, смокини$, нар$, нарове$]
+    exclude:
+      [бар, пюре, каша, сок, нектар, напитк, сладко, конфитюр, бисквит, десерт, йогурт, мюсли, сироп, чай, бира, вино, ракия,
+       ликьор, бонбон, желе, шоколад, торта, сладолед, джелато, шампоан, гел, крем, сапун, препарат, освежител, консерв,
+       компот, сушен, пастет, вафл, кекс, чипс, закуск, сладкиш, ароматиз, кърпи, устни, скраб, балсам, лиофилизир, вкус,
+       аромат, activia, danonino, bebivita, hipp, масло, маска, руж, таблетки, табл, капсул, витамин, пастили, ефервесцент,
+       сайдер, tea, тоник, газирана, свинско, месо, чийзкейк, щолен, микс, активиа, fanta, fuze, schweppes, solgar,
+       somersby, адитива, електровит, иновокс, ракъ, марината]
+
+  # Fresh vegetables (potatoes, onions, cabbage, tomatoes, salad greens, mushrooms...). Excludes drop prepared food and non-food.
+  - name: Зеленчуци
+    keywords:
+      [домат$, домати$, краставица$, краставици$, чушка$, чушки$, картоф$, картофи$, морков$, моркови$, лук$, лука$, зеле$,
+       карфиол$, броколи$, тиква$, тикви$, тиквичка$, тиквички$, патладжан$, патладжани$, спанак$, маруля$, айсберг$,
+       рукола$, гъби$, печурки$, цвекло$, чесън$, репички$, ряпа$, целина$, праз$]
+    exclude:
+      [пюре, сок, сос, кетчуп, лютеница, консерв, туршия, мариновани, супа, разядка, пица, баница, пастет, наденица, колбас,
+       салам, сирене, мляко, чипс, пържен, сушен, замразен, белени, пасирани, кубчета, стерилизирани, шампоан, балсам, крем,
+       гел, храна за, mutti, бебе, маска, сапун, комплект, полиращи, екстракт, капсул, таблетки, hipp, gerber, закуска, меню,
+       пръчици, пауч, катък, салата с, салата чушки, маслини, деликатес, микс, печени, печено, кюфтета, фетучини, хумус, део,
+       спрей, топлата витрина, подправки, бланширани, пукани, люти, майонез, вернада, с чесън, кенар, свинско, филе, детелина]
+
+  # Laundry powder (also catches "Гел, Прах или Капсули" laundry deals; gels and liquids alone are not included).
+  - name: Прах за пране
+    keywords: [прах за пране, перилен прах, прах$]
+    exclude: [на прах, за печене, за съдомиялна, за съдове, vanish, лиофилизир, мляко, храна, протеин, какао, пудра]
+
+  # Chocolate bars and chocolate itself; excludes drop biscuits, desserts, ice cream, cosmetics, liqueurs, "with chocolate" items.
+  - name: Шоколад
+    keywords: [шоколад$, аерошоколад$]
+    exclude:
+      [бисквит, вафл, кроасан, десерт, торта, сладолед, джелато, сладкиш, панетоне, донът, курабии, мъфин, гранола, ликьор,
+       скраб, балсам, маска, крем, суфле, турон, мляко, напитк, кекс, сироп, зърнена, мюсли, пълнеж, глазура, еклер,
+       с шоколад, със шоколад, шоколадов]

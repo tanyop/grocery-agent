@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 
 import yaml
@@ -37,6 +39,8 @@ def load_watchlist(path: str | Path) -> list[WatchItem]:
         keywords = _str_list(raw.get("keywords"), f"{name}: keywords")
         if not keywords:
             raise ValueError(f"{path}: item '{name}' needs at least one keyword")
+        if any(not k.rstrip("$") for k in keywords):
+            raise ValueError(f"{path}: item '{name}' has an empty keyword")
         max_price = raw.get("max_price")
         if max_price is not None:
             try:
@@ -47,11 +51,19 @@ def load_watchlist(path: str | Path) -> list[WatchItem]:
     return items
 
 
+@lru_cache(maxsize=None)
+def _pattern(word: str) -> re.Pattern[str]:
+    """A keyword matches at the start of a word; a trailing '$' also requires the word to end there."""
+    whole = word.endswith("$")
+    core = word[:-1] if whole else word
+    return re.compile(r"(?<!\w)" + re.escape(core.casefold()) + (r"(?!\w)" if whole else ""))
+
+
 def _hit(offer: Offer, item: WatchItem) -> bool:
     text = offer.name.casefold()
-    if not any(k.casefold() in text for k in item.keywords):
+    if not any(_pattern(k).search(text) for k in item.keywords):
         return False
-    if any(x.casefold() in text for x in item.exclude):
+    if any(_pattern(x).search(text) for x in item.exclude):
         return False
     return item.max_price is None or offer.price <= item.max_price
 

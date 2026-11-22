@@ -18,15 +18,15 @@ def make_client() -> httpx.Client:
     )
 
 
-def fetch(client: httpx.Client, url: str, attempts: int = 3, backoff: float = 2.0) -> str:
-    """GET a page as text, retrying on network errors and 5xx. 4xx fails at once."""
+def _get(client: httpx.Client, url: str, attempts: int, backoff: float) -> httpx.Response:
+    """GET with retries on network errors and 5xx. 4xx fails at once."""
     last: Exception | None = None
     for i in range(attempts):
         try:
             r = client.get(url)
             if r.status_code < 500:
                 r.raise_for_status()
-                return r.text
+                return r
             last = httpx.HTTPStatusError(f"{r.status_code} for {url}", request=r.request, response=r)
         except httpx.HTTPStatusError:
             raise
@@ -36,3 +36,13 @@ def fetch(client: httpx.Client, url: str, attempts: int = 3, backoff: float = 2.
             time.sleep(backoff * (i + 1))
     assert last is not None
     raise last
+
+
+def fetch(client: httpx.Client, url: str, attempts: int = 3, backoff: float = 2.0) -> str:
+    """GET a page as text."""
+    return _get(client, url, attempts, backoff).text
+
+
+def fetch_bytes(client: httpx.Client, url: str, attempts: int = 3, backoff: float = 2.0) -> bytes:
+    """GET a file (for example a zip) as bytes."""
+    return _get(client, url, attempts, backoff).content

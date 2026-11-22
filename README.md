@@ -1,12 +1,12 @@
 # grocery-agent
 
-Every day it reads the current promotions of **Lidl, Kaufland, Billa and eBag** (Bulgaria), keeps only the products on your
+Every day it reads the current promotions of **Lidl, Kaufland, Billa, eBag and Fantastico** (Bulgaria), keeps only the products on your
 `watchlist.yaml`, builds a phone-friendly `digest.html`, and sends it to you on **Telegram**: a short text with
 the *new* matches, plus the full HTML file.
 
 Offers change weekly, so the daily run only messages you when something new matches (or a shop could not be read).
 
-Fantastico is not included: its site refuses automated requests (HTTP 403) and publishes brochures only.
+Fantastico's own site refuses automated requests (HTTP 403), so its promotions come from the official open price data of the consumer protection commission instead (see below).
 
 ## One-time setup
 
@@ -28,7 +28,7 @@ python -m venv .venv
 .venv\Scripts\python -m grocery_agent             # the real thing: sends to Telegram
 ```
 
-Flags: `--always` send even if nothing is new, `--all` treat every match as new, `--shops Lidl,Billa,eBag`,
+Flags: `--always` send even if nothing is new, `--all` treat every match as new, `--shops Lidl,Billa,eBag,Fantastico`,
 `--watchlist`, `--state`, `--out`. Tests: `.venv\Scripts\python -m pytest`.
 
 ## Run daily in the cloud (GitHub Actions)
@@ -50,6 +50,7 @@ on your own PC with Windows Task Scheduler instead.
 | Kaufland | offer JSON embedded in the all-offers page |
 | Lidl | product tiles (`data-grid-data`) on campaign and category pages found from the homepage |
 | eBag | the JSON feed behind the site's "Оферти" page (about 200 requests; regular price, promo price, discount and dates) |
+| Fantastico | official daily open data of КЗП (kolkostruva.bg/opendata): one zip with all chains, of which only Fantastico's files are read. Regular and promotion price, no validity dates, data is from the previous day |
 
 If a site changes its layout, that shop's scraper fails on its own, the digest says which shop could not be read,
 and the other shops still arrive. Parsers are tested against trimmed snapshots in `tests/fixtures/`.

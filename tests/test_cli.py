@@ -73,5 +73,5 @@ def test_scrapers_receive_all_watchlist_keywords(tmp_path, monkeypatch):
     assert seen["keywords"] == ["мляко", "skyr", "пилешк"]
 
 
-def test_ebag_is_a_known_shop():
-    assert "eBag" in cli.SCRAPERS
+def test_all_five_shops_are_known():
+    assert set(cli.SCRAPERS) == {"Lidl", "Kaufland", "Billa", "eBag", "Fantastico"}

@@ -6,3 +6,4 @@ out/
 .env
 .superpowers/
 *.egg-info/
+.playwright-mcp/
