@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Protocol
 
 from .models import Offer
-from .render import Entry, render_digest, summary_messages
+from .render import Entry, render_digest
 from .state import State
 from .watchlist import WatchItem, match
 
@@ -16,7 +16,6 @@ log = logging.getLogger(__name__)
 
 
 class Sender(Protocol):
-    def send_message(self, text: str) -> None: ...
     def send_document(self, filename: str, content: bytes, caption: str = "") -> None: ...
 
 
@@ -83,14 +82,8 @@ def run(
         raise ValueError("a sender is required unless dry_run is set")
 
     if result.new_count or result.failed_shops or options.always:
-        for text in summary_messages(groups, result.failed_shops, options.today):
-            sender.send_message(text)
-        if groups or options.always:
-            sender.send_document(
-                f"promocii-{options.today:%Y-%m-%d}.html",
-                html.encode("utf-8"),
-                f"Всички съвпадения · {result.match_count}",
-            )
+        # only the HTML file is sent: failed shops and "nothing matched" are already explained inside it
+        sender.send_document(f"promocii-{options.today:%Y-%m-%d}.html", html.encode("utf-8"))
         result.sent = True
 
     # only reached when sending (if any) succeeded, so a failed send is retried next run

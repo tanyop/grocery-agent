@@ -17,15 +17,16 @@ def offer(name="Прясно мляко", price=1.2, shop="Lidl", valid_to=date(
 
 class FakeTelegram:
     def __init__(self, fail=False):
-        self.messages, self.documents, self.fail = [], [], fail
+        self.messages, self.documents, self.captions, self.fail = [], [], [], fail
 
     def send_message(self, text):
-        if self.fail:
-            raise RuntimeError("telegram down")
         self.messages.append(text)
 
     def send_document(self, filename, content, caption=""):
+        if self.fail:
+            raise RuntimeError("telegram down")
         self.documents.append((filename, content.decode("utf-8")))
+        self.captions.append(caption)
 
 
 def scrapers(**by_shop):
@@ -42,11 +43,12 @@ def opts(tmp_path, **kw):
     return Options(out_dir=tmp_path / "out", state_path=tmp_path / "seen.json", today=TODAY, **kw)
 
 
-def test_new_offer_is_sent_with_summary_and_html_and_remembered(tmp_path):
+def test_new_offer_is_sent_as_html_file_only_and_remembered(tmp_path):
     tg = FakeTelegram()
     result = run(ITEMS, scrapers(Lidl=[offer()]), opts(tmp_path), tg)
     assert result.sent and result.new_count == 1
-    assert "Прясно мляко" in tg.messages[0]
+    assert tg.messages == [] and tg.captions == [""]  # no text at all, just the file
+    assert len(tg.documents) == 1
     assert tg.documents[0][0].endswith(".html") and "Прясно мляко" in tg.documents[0][1]
     assert (tmp_path / "out" / "digest.html").exists()
     assert State.load(tmp_path / "seen.json").is_new(offer()) is False
@@ -84,7 +86,7 @@ def test_one_failing_shop_does_not_stop_the_others_and_is_reported(tmp_path):
     result = run(ITEMS, scrapers(Lidl=RuntimeError("blocked"), Billa=[offer(shop="Billa")]), opts(tmp_path), tg)
     assert result.failed_shops == ["Lidl"]
     assert result.sent and result.new_count == 1
-    assert "Lidl" in tg.messages[0]
+    assert tg.messages == [] and "Lidl" in tg.documents[0][1]  # the warning lives inside the HTML
     assert not result.all_failed
 
 
@@ -92,7 +94,8 @@ def test_all_shops_failing_is_flagged_and_still_notifies(tmp_path):
     tg = FakeTelegram()
     result = run(ITEMS, scrapers(Lidl=RuntimeError("x"), Billa=RuntimeError("y")), opts(tmp_path), tg)
     assert result.all_failed and result.sent
-    assert "Lidl" in tg.messages[0] and "Billa" in tg.messages[0]
+    assert tg.messages == []
+    assert "Lidl" in tg.documents[0][1] and "Billa" in tg.documents[0][1]
 
 
 def test_dry_run_writes_html_but_sends_nothing_and_keeps_state(tmp_path):

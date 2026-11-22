@@ -1,10 +1,10 @@
 # grocery-agent
 
 Every day it reads the current promotions of **Lidl, Kaufland, Billa, eBag and Fantastico** (Bulgaria), keeps only the products on your
-`watchlist.yaml`, builds a phone-friendly `digest.html`, and sends it to you on **Telegram**: a short text with
-the *new* matches, plus the full HTML file.
+`watchlist.yaml`, builds a phone-friendly `digest.html`, and sends that file to you on **Telegram** (just the file, no
+text message). Inside it, new offers are marked and you can filter by shop and category.
 
-Offers change weekly, so the daily run only messages you when something new matches (or a shop could not be read).
+Offers change weekly, so the daily run only sends the file when something new matches (or a shop could not be read).
 
 Fantastico's own site refuses automated requests (HTTP 403), so its promotions come from the official open price data of the consumer protection commission instead (see below).
 
